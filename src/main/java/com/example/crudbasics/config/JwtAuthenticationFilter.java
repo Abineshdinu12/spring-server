@@ -20,6 +20,7 @@ import java.security.Key;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     @Value("${jwt.secret}")
     private String jwtSecret;
     private Key key;
@@ -40,10 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .parseClaimsJws(jwt)
                     .getBody();
             String username = claims.getSubject();
-            if (username != null) {
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 CustomAuthenticationToken authentication = new CustomAuthenticationToken(username, null, null);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
